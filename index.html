@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>WeatherWise AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #07111f;
+      color: #ffffff;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0b1d33, #12345a);
+      padding: 20px;
+      border-bottom: 1px solid #28476b;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-inner {
+      max-width: 1300px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #4db8ff;
+    }
+
+    .status {
+      font-size: 13px;
+      color: #a9c7e8;
+    }
+
+    main {
+      max-width: 1300px;
+      margin: auto;
+      padding: 25px;
+    }
+
+    .warning {
+      background: #251c08;
+      border: 1px solid #8c6b1c;
+      color: #ffd76b;
+      padding: 13px 15px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .search-area {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .search-area input {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      border: 1px solid #385676;
+      background: #0c1b2d;
+      color: white;
+      font-size: 16px;
+      outline: none;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 13px 18px;
+      background: #168cff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0875db;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #0d1c2f, #0a1727);
+      border: 1px solid #243c59;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    }
+
+    .wide {
+      grid-column: span 2;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 16px;
+    }
+
+    .location {
+      color: #9bb8d7;
+      margin-bottom: 10px;
+    }
+
+    .temperature {
+      font-size: 65px;
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    .condition {
+      font-size: 20px;
+      color: #b9d6f4;
+    }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .detail {
+      background: #0b1625;
+      padding: 12px;
+      border-radius: 10px;
+    }
+
+    .detail small {
+      color: #829dbb;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .detail strong {
+      font-size: 16px;
+    }
+
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .risk {
+      background: #0a1727;
+      border-radius: 12px;
+      padding: 15px;
+      border: 1px solid #243c59;
+    }
+
+    .risk-name {
+      color: #9db8d3;
+      margin-bottom: 8px;
+    }
+
+    .risk-value {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .risk-low {
+      color: #65d88a;
+    }
+
+    .risk-medium {
+      color: #ffd45c;
+    }
+
+    .risk-high {
+      color: #ff8b61;
+    }
+
+    .forecast {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .day {
+      background: #0a1727;
+      padding: 15px 10px;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid #203650;
+    }
+
+    .day-name {
+      color: #9bb7d3;
+      margin-bottom: 12px;
+    }
+
+    .weather-icon {
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .high {
+      font-weight: bold;
+    }
+
+    .low {
+      color: #7795b5;
+      margin-top: 4px;
+    }
+
+    .models {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .model {
+      padding: 15px;
+      background: #0a1727;
+      border-radius: 12px;
+      border: 1px solid #203650;
+    }
+
+    .model h3 {
+      margin-bottom: 8px;
+    }
+
+    .model p {
+      color: #9bb5cf;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .confidence {
+      margin-top: 12px;
+      height: 8px;
+      background: #172b42;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .confidence-bar {
+      height: 100%;
+      background: #168cff;
+      width: 75%;
+    }
+
+    .ai-box {
+      background: linear-gradient(135deg, #101e35, #122a45);
+      border: 1px solid #2d577e;
+    }
+
+    .ai-response {
+      line-height: 1.7;
+      color: #c9dff4;
+      min-height: 60px;
+    }
+
+    .ai-input {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .ai-input input {
+      flex: 1;
+      padding: 13px;
+      border-radius: 9px;
+      border: 1px solid #385676;
+      background: #091524;
+      color: white;
+    }
+
+    .radar {
+      height: 300px;
+      border-radius: 12px;
+      background:
+        radial-gradient(circle at 50% 50%, #193d53 0%, #102d3e 20%, #092333 45%, #061522 70%);
+      border: 1px solid #2b4d69;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #8eabc5;
+    }
+
+    .hurricane {
+      background: #0a1727;
+      border: 1px solid #263f59;
+      padding: 18px;
+      border-radius: 12px;
+    }
+
+    .hurricane-title {
+      font-size: 19px;
+      margin-bottom: 8px;
+    }
+
+    .hurricane p {
+      color: #8faac4;
+      line-height: 1.6;
+    }
+
+    footer {
+      margin-top: 35px;
+      padding: 25px;
+      text-align: center;
+      color: #7189a3;
+      border-top: 1px solid #1e344c;
+      font-size: 13px;
+    }
+
+    @media (max-width: 900px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wide {
+        grid-column: span 1;
+      }
+
+      .risk-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .models {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .forecast {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .details {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 15px;
+      }
+
+      main {
+        padding: 15px;
+      }
+
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .search-area {
+        flex-direction: column;
+      }
+
+      .risk-grid,
+      .models {
+        grid-template-columns: 1fr;
+      }
+
+      .forecast {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .temperature {
+        font-size: 52px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      Weather<span>Wise</span> AI
+    </div>
+
+    <div class="status">
+      Weather Analysis Center
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="warning">
+    ⚠️ <strong>DEMO MODE:</strong>
+    Weather values shown on this page are demonstration data.
+    This website is not an official warning source.
+  </div>
+
+  <div class="search-area">
+    <input
+      id="locationInput"
+      type="text"
+      placeholder="Enter a city, ZIP code, or location..."
+      value="Muncie, Indiana"
+    >
+
+    <button onclick="searchLocation()">
+      Search
+    </button>
+  </div>
+
+  <div class="grid">
+
+    <!-- CURRENT WEATHER -->
+    <section class="card">
+      <div class="card-title">Current Conditions</div>
+
+      <div class="location" id="locationName">
+        Muncie, Indiana
+      </div>
+
+      <div class="temperature">
+        72°F
+      </div>
+
+      <div class="condition">
+        Partly Cloudy
+      </div>
+
+      <div class="details">
+
+        <div class="detail">
+          <small>Feels Like</small>
+          <strong>71°F</strong>
+        </div>
+
+        <div class="detail">
+          <small>Humidity</small>
+          <strong>62%</strong>
+        </div>
+
+        <div class="detail">
+          <small>Wind</small>
+          <strong>SW 9 MPH</strong>
+        </div>
+
+        <div class="detail">
+          <small>Pressure</small>
+          <strong>29.98"</strong>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- SEVERE WEATHER -->
+    <section class="card">
+      <div class="card-title">
+        Severe Weather Analysis
+      </div>
+
+      <div class="risk-grid">
+
+        <div class="risk">
+          <div class="risk-name">Tornado</div>
+          <div class="risk-value risk-low">2%</div>
+        </div>
+
+        <div class="risk">
+          <div class="risk-name">Hail</div>
+          <div class="risk-value risk-medium">8%</div>
+        </div>
+
+        <div class="risk">
+          <div class="risk-name">Wind</div>
+          <div class="risk-value risk-medium">14%</div>
+        </div>
+
+        <div class="risk">
+          <div class="risk-name">Flooding</div>
+          <div class="risk-value risk-low">5%</div>
+        </div>
+
+      </div>
+
+      <br>
+
+      <p style="color:#9bb5cf; line-height:1.6;">
+        These values are demonstration values representing
+        how the future analysis system could display
+        severe-weather probabilities.
+      </p>
+    </section>
+
+
+    <!-- FORECAST -->
+    <section class="card wide">
+
+      <div class="card-title">
+        7-Day Forecast
+      </div>
+
+      <div class="forecast">
+
+        <div class="day">
+          <div class="day-name">Today</div>
+          <div class="weather-icon">🌤️</div>
+          <div class="high">75°</div>
+          <div class="low">57°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Thu</div>
+          <div class="weather-icon">⛅</div>
+          <div class="high">78°</div>
+          <div class="low">59°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Fri</div>
+          <div class="weather-icon">🌧️</div>
+          <div class="high">72°</div>
+          <div class="low">58°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Sat</div>
+          <div class="weather-icon">🌦️</div>
+          <div class="high">74°</div>
+          <div class="low">56°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Sun</div>
+          <div class="weather-icon">☀️</div>
+          <div class="high">79°</div>
+          <div class="low">55°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Mon</div>
+          <div class="weather-icon">☀️</div>
+          <div class="high">81°</div>
+          <div class="low">58°</div>
+        </div>
+
+        <div class="day">
+          <div class="day-name">Tue</div>
+          <div class="weather-icon">⛅</div>
+          <div class="high">80°</div>
+          <div class="low">60°</div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- AI ANALYST -->
+    <section class="card ai-box wide">
+
+      <div class="card-title">
+        🤖 AI Weather Analyst
+      </div>
+
+      <div class="ai-response" id="aiResponse">
+        Ask the AI analyst about the current forecast,
+        severe weather potential, model disagreement,
+        or expected impacts.
+      </div>
+
+      <div class="ai-input">
+
+        <input
+          id="aiInput"
+          type="text"
+          placeholder="Ask something about the weather..."
+        >
+
+        <button onclick="askAI()">
+          Analyze
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- WEATHER MODELS -->
+    <section class="card wide">
+
+      <div class="card-title">
+        Numerical Weather Model Center
+      </div>
+
+      <div class="models">
+
+        <div class="model">
+          <h3>GFS</h3>
+          <p>
+            Global Forecast System.
+            Demonstration model entry for
+            future model comparison.
+          </p>
+
+          <div class="confidence">
+            <div class="confidence-bar" style="width:76%;"></div>
+          </div>
+        </div>
+
+        <div class="model">
+          <h3>ECMWF</h3>
+          <p>
+            European model.
+            Future versions can compare
+            forecast solutions against other models.
+          </p>
+
+          <div class="confidence">
+            <div class="confidence-bar" style="width:82%;"></div>
+          </div>
+        </div>
+
+        <div class="model">
+          <h3>NAM</h3>
+          <p>
+            High-resolution regional model
+            that can be used for shorter-range
+            analysis.
+          </p>
+
+          <div class="confidence">
+            <div class="confidence-bar" style="width:69%;"></div>
+          </div>
+        </div>
+
+        <div class="model">
+          <h3>AI Ensemble</h3>
+          <p>
+            Future AI system that can compare
+            multiple forecast inputs and explain
+            uncertainty.
+          </p>
+
+          <div class="confidence">
+            <div class="confidence-bar" style="width:88%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- RADAR -->
+    <section class="card">
+
+      <div class="card-title">
+        Radar
+      </div>
+
+      <div class="radar">
+        <div>
+          <strong>Radar Display</strong>
+          <br><br>
+          Live radar will be connected here.
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- HURRICANE CENTER -->
+    <section class="card">
+
+      <div class="card-title">
+        Hurricane / Tropical Center
+      </div>
+
+      <div class="hurricane">
+
+        <div class="hurricane-title">
+          Tropical System Tracking
+        </div>
+
+        <p>
+          No live tropical systems are being
+          displayed in this demonstration.
+          Future versions can include storm tracks,
+          forecast cones, model guidance, wind
+          probabilities, and expected impacts.
+        </p>
+
+      </div>
+
+    </section>
+
+  </div>
+
+</main>
+
+
+<footer>
+  WeatherWise AI • Experimental Weather Analysis Platform
+  <br><br>
+  Not affiliated with or operated by the National Weather Service.
+</footer>
+
+
+<script>
+
+  function searchLocation() {
+
+    const input =
+      document.getElementById("locationInput").value.trim();
+
+    if (input === "") {
+      alert("Please enter a location.");
+      return;
+    }
+
+    document.getElementById("locationName").textContent = input;
+
+    alert(
+      "Location search is currently running in demo mode. " +
+      "Live weather data will be connected in the next version."
+    );
+  }
+
+
+  function askAI() {
+
+    const input =
+      document.getElementById("aiInput").value.trim();
+
+    const response =
+      document.getElementById("aiResponse");
+
+    if (input === "") {
+      response.textContent =
+        "Enter a weather question for the analyst.";
+      return;
+    }
+
+    response.innerHTML =
+      "<strong>AI Analysis:</strong><br>" +
+      "This is a demonstration response. " +
+      "The live AI system will eventually analyze " +
+      "weather observations, forecast models, radar, " +
+      "alerts, and model disagreement before producing " +
+      "an explanation.";
+  }
+
+
+  document
+    .getElementById("aiInput")
+    .addEventListener("keypress", function(event) {
+
+      if (event.key === "Enter") {
+        askAI();
+      }
+
+    });
+
+
+  document
+    .getElementById("locationInput")
+    .addEventListener("keypress", function(event) {
+
+      if (event.key === "Enter") {
+        searchLocation();
+      }
+
+    });
+
+</script>
+
+</body>
+</html>
+
