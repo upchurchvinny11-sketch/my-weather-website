@@ -1,6 +1,7 @@
-index.html
-style.css
-app.js
+my-weather-website/
+├── index.html
+├── style.css
+└── app.js
 
 <!DOCTYPE html>
 <html lang="en">
